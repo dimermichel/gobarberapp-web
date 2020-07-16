@@ -1,44 +1,31 @@
 import React from 'react';
-import { FiAlertCircle, FiXCircle } from 'react-icons/fi';
-import { Container, Toast } from './styles';
+import { useTransition } from 'react-spring';
+import { Container } from './styles';
+import Toast from './Toast';
+import { ToastMessage } from '../../hooks/Toast';
 
-const ToastContainer: React.FC = () => (
-  <Container>
-    <Toast hasDescription>
-      <FiAlertCircle size={20} />
-      <div>
-        <strong>There was an error</strong>
-        <p>There is no connection with the server</p>
-      </div>
+interface ToastContainerProps {
+  messages: ToastMessage[];
+}
 
-      <button type="button">
-        <FiXCircle size={18} />
-      </button>
-    </Toast>
+const ToastContainer: React.FC<ToastContainerProps> = ({ messages }) => {
+  const messagesWithTransitions = useTransition(
+    messages,
+    message => message.id,
+    {
+      from: { right: '-120%', opacity: 0 },
+      enter: { right: '0', opacity: 1 },
+      leave: { right: '-120%', opacity: 0 },
+    },
+  );
 
-    <Toast type="success" hasDescription={false}>
-      <FiAlertCircle size={20} />
-      <div>
-        <strong>There was an error</strong>
-      </div>
-
-      <button type="button">
-        <FiXCircle size={18} />
-      </button>
-    </Toast>
-
-    <Toast type="error" hasDescription>
-      <FiAlertCircle size={20} />
-      <div>
-        <strong>There was an error</strong>
-        <p>There is no connection with the server</p>
-      </div>
-
-      <button type="button">
-        <FiXCircle size={18} />
-      </button>
-    </Toast>
-  </Container>
-);
+  return (
+    <Container>
+      {messagesWithTransitions.map(({ item, key, props }) => (
+        <Toast key={key} style={props} message={item} />
+      ))}
+    </Container>
+  );
+};
 
 export default ToastContainer;
